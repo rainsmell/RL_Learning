@@ -1,7 +1,7 @@
 import time
 from typing import Optional, Union, List, Tuple
 
-import gym
+import gymnasium as gym
 import numpy as np
 from gym import spaces
 from gym.core import RenderFrame, ActType, ObsType
@@ -83,7 +83,7 @@ class GridEnv(gym.Env):
     def render(self) -> Optional[Union[RenderFrame, List[RenderFrame]]]:
         if self.render_mode == "video":
             self.render_.save_video('image/' + str(time.time()))
-        self.render_.show_frame(0.3)
+        self.render_.show_frame(60)
         return None
 
     def get_obs(self) -> ObsType:
@@ -116,25 +116,24 @@ class GridEnv(gym.Env):
         故而这里的rsa蕴含了next_state的信息
         :return:
         """
-        state_size = self.size ** 2
+        state_size = self.size ** 2 # 状态空间大小
         self.Psa = np.zeros(shape=(state_size, self.action_space_size, state_size), dtype=float)
-        self.Rsa = np.zeros(shape=(self.size ** 2, self.action_space_size, len(self.reward_list)), dtype=float)
-        for state_index in range(state_size):
-            for action_index in range(self.action_space_size):
-                pos = self.state2pos(state_index)
-                next_pos = pos + self.action_to_direction[action_index]
-                if next_pos[0] < 0 or next_pos[1] < 0 or next_pos[0] > self.size - 1 or next_pos[1] > self.size - 1:
-                    self.Psa[state_index, action_index, state_index] = 1
-                    self.Rsa[state_index, action_index, 3] = 1
-
+        self.Rsa = np.zeros(shape=(state_size, self.action_space_size, len(self.reward_list)), dtype=float)
+        for state_index in range(state_size): # 遍历状态空间
+            for action_index in range(self.action_space_size): # 遍历动作空间
+                pos = self.state2pos(state_index) # 状态序号转换为二维pos
+                next_pos = pos + self.action_to_direction[action_index] # 动作序号转换为二维pos
+                if next_pos[0] < 0 or next_pos[1] < 0 or next_pos[0] > self.size - 1 or next_pos[1] > self.size - 1: # 边界判断
+                    self.Psa[state_index, action_index, state_index] = 1 # 撞墙返回当前状态概率为1
+                    self.Rsa[state_index, action_index, 3] = 1 # 撞墙取reward[3]概率为1 -> -10
                 else:
-                    self.Psa[state_index, action_index, self.pos2state(next_pos)] = 1
-                    if np.array_equal(next_pos, self.target_location):
+                    self.Psa[state_index, action_index, self.pos2state(next_pos)] = 1 # 跳转下个状态的概率为1
+                    if np.array_equal(next_pos, self.target_location): # 跳转的pos等于target_location, reward[1]概率为1 -> 1
                         self.Rsa[state_index, action_index, 1] = 1
-                    elif arr_in_list(next_pos, self.forbidden_location):
+                    elif arr_in_list(next_pos, self.forbidden_location): # 跳转的pos等于forbidden_location, reward[2]概率为1 -> -10
                         self.Rsa[state_index, action_index, 2] = 1
                     else:
-                        self.Rsa[state_index, action_index, 0] = 1
+                        self.Rsa[state_index, action_index, 0] = 1 # 其他情况取reward[0]概率为1 -> 0
 
     def close(self):
         pass
@@ -143,3 +142,4 @@ class GridEnv(gym.Env):
 if __name__ == "__main__":
     grid = GridEnv(size=5, target=[1, 2], forbidden=[[2, 2]], render_mode='')
     grid.render()
+    

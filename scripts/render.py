@@ -20,7 +20,7 @@ class Render:
         self.target = target
         self.forbidden = forbidden
         self.size = size
-        self.fig = plt.figure(figsize=(10, 10), dpi=self.size * 20)
+        self.fig = plt.figure(figsize=(10, 10), dpi=self.size * 10)
         self.ax = plt.gca()
         self.ax.xaxis.set_ticks_position('top')
         self.ax.invert_yaxis()
@@ -150,7 +150,12 @@ class Render:
         :param t: 持续时间
         :return: None
         """
-        self.fig.show()
+        # plt.show()
+        if t > 0:
+            self.fig.show()
+            plt.pause(t)
+        plt.show()
+
 
     def save_frame(self, name: str) -> None:
         """

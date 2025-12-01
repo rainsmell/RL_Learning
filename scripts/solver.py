@@ -73,8 +73,8 @@ class Solve:
             qvalue_list = []
             for action in range(self.action_space_size):
                 qvalue_list.append(self.calculate_qvalue(state, action, state_value.copy()))
-            state_value_k[state] = max(qvalue_list)
-            action_star = qvalue_list.index(max(qvalue_list))
+            state_value_k[state] = max(qvalue_list) # max q value
+            action_star = qvalue_list.index(max(qvalue_list)) # action index from max q value
             policy[state, action_star] = 1
         return policy, state_value_k
 
@@ -949,11 +949,13 @@ if __name__ == "__main__":
     #                        render_mode='')
     solver = Solve(env)
     # solver.show_state_value(solver.state_value, y_offset=0.2)
-    solver.q_learning_off_policy()
-    solver.state_value = solver.policy_evaluation(solver.policy, steps=100)
+    # solver.q_learning_off_policy()
+    # solver.state_value = solver.policy_evaluation(solver.policy, steps=100)
 
     start_time = time.time()
-    solver.dqn()
+    solver.value_iteration()
+
+    # solver.dqn()
     # solver.q_learning_off_policy()
 
     # solver.td_value_approximation()
