@@ -233,8 +233,8 @@ if __name__ == '__main__':
     render.draw_action(pos=[3, 3], toward=(0, 0.4))
     # render.save_frame('test1')
 
-    for num in range(10):
-        render.draw_random_line(pos1=[1.5, 1.5], pos2=[1.5, 2.5])
+    # for num in range(1):
+        # render.draw_random_line(pos1=[1.5, 1.5], pos2=[1.5, 2.5])
 
     action_to_direction = {
         0: np.array([-1, 0]),
@@ -245,11 +245,11 @@ if __name__ == '__main__':
     }
     uniform_policy = np.random.random(size=(25, 5))
     # uniform_policy = np.ones(shape=(25, 5)) / 5
-    # for state in range(25):
-    #     for action in range(5):
-    #         policy = uniform_policy[state, action]
-    #         render.draw_action(pos=[state // 5, state % 5], toward=policy * 0.4 * action_to_direction[action],
-    #                            radius=0.03 + 0.07 * policy)
-    for a in range(5):
-        render.trajectory.append((a, a))
+    for state in range(25):
+        for action in range(5):
+            policy = uniform_policy[state, action]
+            render.draw_action(pos=[state // 5, state % 5], toward=policy * 0.4 * action_to_direction[action],
+                               radius=0.03 + 0.07 * policy)
+    # for a in range(5):
+        # render.trajectory.append((a, a))
     render.show_frame()
